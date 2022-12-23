@@ -1,52 +1,83 @@
 <!-- MDTOC maxdepth:6 firsth1:1 numbering:0 flatten:0 bullets:1 updateOnSave:1 -->
 
    - [kickstart重点语法注释](#kickstart重点语法注释)   
-      - [install mode](#install-mode)   
-      - [Keyboard layouts](#keyboard-layouts)   
-      - [Network information](#network-information)   
-      - [Reboot after installation](#reboot-after-installation)   
-      - [repository config](#repository-config)   
-      - [Root password](#root-password)   
-      - [time configuration](#time-configuration)   
+      - [显示模式（install mode）](#显示模式（install-mode）)   
+      - [键盘布局（Keyboard layouts）](#键盘布局（keyboard-layouts）)   
+      - [网络信息（Network information）](#网络信息（network-information）)   
+      - [安装结束后是否重启（Reboot after installation）](#安装结束后是否重启（reboot-after-installation）)   
+      - [仓库配置（repository config）](#仓库配置（repository-config）)   
+      - [root密码（Root password）](#root密码（root-password）)   
+      - [时间源配置（time source configuration）](#时间源配置（time-source-configuration）)   
+      - [时区选择（time configuration）](#时区选择（time-configuration）)   
       - [Use network installation](#use-network-installation)   
       - [System bootloader configuration](#system-bootloader-configuration)   
-      - [Clear the Master Boot Record](#clear-the-master-boot-record)   
-      - [Partition clearing information](#partition-clearing-information)   
-      - [post script](#post-script)   
-      - [packages installation configuration](#packages-installation-configuration)   
+      - [自动分区（auto partition）](#自动分区（auto-partition）)   
+      - [清空MBR分区表（Clear the Master Boot Record）](#清空mbr分区表（clear-the-master-boot-record）)   
+      - [删除分区（Partition clearing information）](#删除分区（partition-clearing-information）)   
+      - [附加脚本（post script）](#附加脚本（post-script）)   
+      - [安装包配置（packages installation configuration）](#安装包配置（packages-installation-configuration）)   
 
 <!-- /MDTOC -->
 
 ## kickstart重点语法注释
 
-### install mode
+### 显示模式（install mode）
+
+> pykickstart/commands/displaymode.py
+
+只有三种安装模式：cmdline、graphical、text，三种模式必选其一
 
 ```
+# Use text mode install
 text
 
+# Use graphical install
 graphical
+
+
+cmdline
 ```
 
-### Keyboard layouts
+这里名称有点迷惑人，会让人怀疑是不是要安装图形界面，其实不然，
+
+此处仅仅是安装时候的模式，实际安装的内容是在%package中指定
+
+
+### 键盘布局（Keyboard layouts）
+
+> pykickstart/commands/keyboard.py
 
 ```
+# Keyboard layouts
 keyboard 'us'
 ```
 
-### Network information
+### 网络信息（Network information）
+
+> pykickstart/commands/network.py
 
 ```
+# Network information
 network  --bootproto=dhcp --device=link --activate
 ```
 
 
-### Reboot after installation
+### 安装结束后是否重启（Reboot after installation）
+
+> pykickstart/commands/reboot.py
 
 ```
+# Reboot after installation
 reboot
+
+# Shutdown after installation
+shutdown
 ```
 
-### repository config
+### 仓库配置（repository config）
+
+> pykickstart/commands/repo.py
+
 
 ```
 repo --name="koji-override-0" --baseurl=https://kojipkgs.fedoraproject.org/compose/36/latest-Fedora-36/compose/Everything/x86_64/os/
@@ -54,45 +85,85 @@ repo --name="koji-override-1" --baseurl=https://kojipkgs.fedoraproject.org/compo
 ```
 
 
-### Root password
+### root密码（Root password）
+
+> pykickstart/commands/rootpw.py
 
 ```
+# Root password
 rootpw --iscrypted --lock locked
 ```
 
-### time configuration
+### 时间源配置（time source configuration）
+
+> pykickstart/commands/timesource.py
 
 ```
 timesource --ntp-disable
+
+timesource --nts
+
+timesource --ntp-server=%s
+
+timesource --ntp-pool=%s
+```
+
+### 时区选择（time configuration）
+
+> pykickstart/commands/timezone.py
+
+```
+# System timezone
 timezone Etc/UTC --utc
 ```
 
 ### Use network installation
 
+> pykickstart/commands/url.py
+
 ```
+# Use network installation
 url --url="https://kojipkgs.fedoraproject.org/compose/36/latest-Fedora-36/compose/Everything/x86_64/os/"
 ```
 
 ### System bootloader configuration
 
+> pykickstart/commands/bootloader.py
+
 ```
+# System bootloader configuration
 bootloader --disabled
+```
+
+### 自动分区（auto partition）
+
+> pykickstart/commands/autopart.py
+
+```
 autopart --type=plain --nohome --noboot --noswap
 ```
 
-### Clear the Master Boot Record
+### 清空MBR分区表（Clear the Master Boot Record）
+
+> pykickstart/commands/zerombr.py
 
 ```
+# Clear the Master Boot Record
 zerombr
 ```
 
-### Partition clearing information
+### 删除分区（Partition clearing information）
+
+> pykickstart/commands/clearpart.py
 
 ```
+# Partition clearing information
 clearpart --all
 ```
 
-### post script
+### 附加脚本（post script）
+
+> pykickstart/parser.py
 
 ```
 %post --logfile=/root/anaconda-post.log --erroronfail
@@ -169,7 +240,9 @@ done
 %end
 ```
 
-### packages installation configuration
+### 安装包配置（packages installation configuration）
+
+> pykickstart/parser.py
 
 ```
 %packages --excludedocs --nocore --inst-langs=en --exclude-weakdeps
