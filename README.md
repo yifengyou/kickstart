@@ -35,6 +35,12 @@ machines, making it ideal for network and system administrators.
 
 
 ## 目录
+
+
+* [ks文件是如何生成的](docs/ks文件是如何生成的.md)
+
+---
+
 <!-- MDTOC maxdepth:6 firsth1:1 numbering:0 flatten:0 bullets:1 updateOnSave:1 -->
 
    - [kickstart重点语法注释](#kickstart重点语法注释)   
@@ -242,15 +248,5 @@ vim-minimal
 
 %end
 ```
-
-
-
-
-
-
-
-
-
-
 
 ---
