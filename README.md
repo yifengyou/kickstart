@@ -41,8 +41,6 @@ machines, making it ideal for network and system administrators.
 
 ---
 
-
-
 <!-- MDTOC maxdepth:6 firsth1:1 numbering:0 flatten:0 bullets:1 updateOnSave:1 -->
 
    - [kickstart重点语法注释](#kickstart重点语法注释)   
@@ -54,15 +52,17 @@ machines, making it ideal for network and system administrators.
       - [root密码（Root password）](#root密码（root-password）)   
       - [时间源配置（time source configuration）](#时间源配置（time-source-configuration）)   
       - [时区选择（time configuration）](#时区选择（time-configuration）)   
-      - [Use network installation](#use-network-installation)   
-      - [System bootloader configuration](#system-bootloader-configuration)   
+      - [使用网络安装（Use network installation）](#使用网络安装（use-network-installation）)   
+      - [启动引导配置（System bootloader configuration）](#启动引导配置（system-bootloader-configuration）)   
+      - [防火墙配置（firwall configuration）](#防火墙配置（firwall-configuration）)   
+      - [selinux配置（selinux configuration）](#selinux配置（selinux-configuration）)   
       - [自动分区（auto partition）](#自动分区（auto-partition）)   
       - [清空MBR分区表（Clear the Master Boot Record）](#清空mbr分区表（clear-the-master-boot-record）)   
       - [删除分区（Partition clearing information）](#删除分区（partition-clearing-information）)   
       - [附加脚本（post script）](#附加脚本（post-script）)   
       - [安装包配置（packages installation configuration）](#安装包配置（packages-installation-configuration）)   
 
-<!-- /MDTOC -->
+<!-- /MDTOC -->lang
 
 ## kickstart重点语法注释
 
@@ -101,9 +101,15 @@ keyboard 'us'
 
 > pykickstart/commands/network.py
 
+这里是配置目标系统的网络而非anaconda的网络
+
 ```
 # Network information
-network  --bootproto=dhcp --device=link --activate
+network --bootproto=dhcp --device=link --activate
+
+network --bootproto=dhcp --device=link --activate --onboot=on
+
+network --hostname=localhost.localdomain
 ```
 
 
@@ -139,6 +145,16 @@ repo --name="koji-override-1" --baseurl=https://kojipkgs.fedoraproject.org/compo
 rootpw --iscrypted --lock locked
 ```
 
+### 语言配置（language configuration）
+
+> pykickstart/commands/lang.py
+
+```
+# System language
+lang en_US.UTF-8
+```
+
+
 ### 时间源配置（time source configuration）
 
 > pykickstart/commands/timesource.py
@@ -160,9 +176,11 @@ timesource --ntp-pool=%s
 ```
 # System timezone
 timezone Etc/UTC --utc
+
+timezone --utc --nontp UTC
 ```
 
-### Use network installation
+### 使用网络安装（Use network installation）
 
 > pykickstart/commands/url.py
 
@@ -171,14 +189,33 @@ timezone Etc/UTC --utc
 url --url="https://kojipkgs.fedoraproject.org/compose/36/latest-Fedora-36/compose/Everything/x86_64/os/"
 ```
 
-### System bootloader configuration
+### 启动引导配置（System bootloader configuration）
 
 > pykickstart/commands/bootloader.py
 
 ```
 # System bootloader configuration
-bootloader --disabled
+bootloader --disabled       # 跳过系统引导程序安装、配置，常用于docker
+
+
 ```
+
+### 防火墙配置（firwall configuration）
+
+> pykickstart/commands/firewalld.py
+
+```
+firewall --disabled
+```
+
+### selinux配置（selinux configuration）
+
+> pykickstart/commands/selinux.py
+
+```
+selinux --disabled
+```
+
 
 ### 自动分区（auto partition）
 
@@ -322,6 +359,37 @@ vim-minimal
 -xkeyboard-config
 
 %end
+```
+
+### 初次启动是否运行初始化程序（first boot）
+
+> pykickstart/commands/firstboot.py
+
+初次启动是否执行```initial-setup```（需安装），默认是不执行
+
+```
+firstboot --disable
+firstboot --enable
+firstboot --reconfig
+```
+
+### 跳过图形界面配置（skip x server configuration）
+
+> pykickstart/commands/skipx.py
+
+如果没有图形界面相关组件，默认就是跳过。
+
+```
+# Do not configure the X Window System
+skipx
+```
+
+### 忽略特定磁盘（skip disk）
+
+> pykickstart/commands/ignoredisk.py
+
+```
+ignoredisk --only-use=vda
 ```
 
 
