@@ -7,6 +7,7 @@
       - [安装结束后是否重启（Reboot after installation）](#安装结束后是否重启（reboot-after-installation）)   
       - [仓库配置（repository config）](#仓库配置（repository-config）)   
       - [root密码（Root password）](#root密码（root-password）)   
+      - [语言配置（language configuration）](#语言配置（language-configuration）)   
       - [时间源配置（time source configuration）](#时间源配置（time-source-configuration）)   
       - [时区选择（time configuration）](#时区选择（time-configuration）)   
       - [使用网络安装（Use network installation）](#使用网络安装（use-network-installation）)   
@@ -18,8 +19,13 @@
       - [删除分区（Partition clearing information）](#删除分区（partition-clearing-information）)   
       - [附加脚本（post script）](#附加脚本（post-script）)   
       - [安装包配置（packages installation configuration）](#安装包配置（packages-installation-configuration）)   
+      - [初次启动是否运行初始化程序（first boot）](#初次启动是否运行初始化程序（first-boot）)   
+      - [跳过图形界面配置（skip x server configuration）](#跳过图形界面配置（skip-x-server-configuration）)   
+      - [忽略特定磁盘（skip disk）](#忽略特定磁盘（skip-disk）)   
+      - [是否使用CDROM（using cdrom）](#是否使用cdrom（using-cdrom）)   
+      - [系统服务配置（service configuration）](#系统服务配置（service-configuration）)   
 
-<!-- /MDTOC -->lang
+<!-- /MDTOC -->
 
 ## kickstart重点语法注释
 
@@ -52,6 +58,9 @@ cmdline
 ```
 # Keyboard layouts
 keyboard 'us'
+
+# Keyboard layouts
+keyboard --xlayouts='us'
 ```
 
 ### 网络信息（Network information）
@@ -154,7 +163,8 @@ url --url="https://kojipkgs.fedoraproject.org/compose/36/latest-Fedora-36/compos
 # System bootloader configuration
 bootloader --disabled       # 跳过系统引导程序安装、配置，常用于docker
 
-
+# System bootloader configuration
+bootloader --location=mbr --timeout=1 --boot-drive=vda
 ```
 
 ### 防火墙配置（firwall configuration）
@@ -350,10 +360,25 @@ ignoredisk --only-use=vda
 ```
 
 
+### 是否使用CDROM（using cdrom）
+
+> pykickstart/commands/cdrom.py
 
 
+```
+# Use CDROM installation media
+cdrom
+```
 
 
+### 系统服务配置（service configuration）
+
+> pykickstart/commands/services.py
+
+```
+# System services
+services --enabled="sshd,NetworkManager,chronyd,initial-setup"
+```
 
 
 
