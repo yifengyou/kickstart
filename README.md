@@ -38,6 +38,35 @@ machines, making it ideal for network and system administrators.
 
 
 * [ks文件是如何生成的](docs/ks文件是如何生成的.md)
+* [ks文件结构](docs/ks文件结构.md)
+
+
+
+
+
+## ks配置样本
+
+
+参看sample目录
+
+```
+sample/
+├── docker
+│   └── anaconda-ks_xxx.cfg
+├── iso
+│   └── anaconda-ks_xxx.cfg
+└── versions.dat
+    └── anaconda-ks_xxx.cfg
+```
+
+
+
+
+
+
+
+
+
 
 ---
 
